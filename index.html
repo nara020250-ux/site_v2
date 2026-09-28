@@ -1,0 +1,2203 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gulnara Creates — тексты, визуалы и короткие видео для HR и бизнеса</title>
+  <meta name="description" content="Gulnara Creates: тексты, визуалы и короткие видео для HR и бизнеса. 18 лет в HR и рекрутинге, включая сложные технические отрасли. ИИ — на этапе подготовки, смысл и качество — в моей работе.">
+  <meta name="theme-color" content="#FAF8F5">
+  <style>
+/* ============================================================
+   Gulnara Creates — одностраничный сайт
+   Порядок: 1) переменные  2) база  3) раскладка
+            4) шапка  5) первый экран  6) компоненты
+            7) секции  8) подвал  9) адаптив  10) печать
+   ============================================================ */
+
+/* ---------- 1. ПЕРЕМЕННЫЕ ---------- */
+:root {
+  --bg:          #FAF8F5;
+  --surface:     rgba(255, 255, 255, .84);
+  --surface-2:   rgba(255, 255, 255, .58);
+  --ink:         #16181D;
+  --ink-soft:    #4A4E57;
+  --muted:       #6A6F7C;  /* 4.9:1 на светлом — проходит по контрасту */
+  --line:        #E6E2DA;
+  --accent:      #B3502A;
+  --accent-ink:  #8E3F1F;
+  --accent-soft: #F7EFE9;
+  --night:       #0E1014;
+
+  --radius:    16px;
+  --radius-sm: 10px;
+
+  --container: 1120px;
+  --gap: 24px;
+
+  --shadow-sm: 0 1px 2px rgba(22, 24, 29, .04),
+               0 4px 14px rgba(22, 24, 29, .05);
+  --shadow-md: 0 2px 6px rgba(22, 24, 29, .05),
+               0 14px 38px rgba(22, 24, 29, .08);
+
+  --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter",
+          Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* ---------- 2. БАЗА ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 88px; /* не прижимать заголовки под шапку */
+  scrollbar-gutter: stable;  /* полоса прокрутки не вызывает сдвиг */
+}
+
+body {
+  margin: 0;
+  font-family: var(--sans);
+  font-size: 17px;
+  line-height: 1.62;
+  color: var(--ink);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1, h2, h3, h4 {
+  margin: 0;
+  line-height: 1.18;
+  letter-spacing: -.018em;
+  font-weight: 650;
+}
+
+p  { margin: 0; }
+ul { margin: 0; padding: 0; list-style: none; }
+a  { color: var(--accent); text-decoration: none; }
+a:hover { color: var(--accent-ink); }
+img { max-width: 100%; display: block; }
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 100;
+  padding: 12px 20px;
+  background: var(--ink);
+  color: #fff;
+  border-radius: 0 0 var(--radius-sm) 0;
+}
+.skip-link:focus { left: 0; color: #fff; }
+
+/* ---------- 3. РАСКЛАДКА ---------- */
+.container {
+  width: 100%;
+  max-width: var(--container);
+  margin-inline: auto;
+  padding-inline: 24px;
+}
+
+.section { padding: clamp(56px, 8vw, 96px) 0; }
+
+/* Полупрозрачная секция — сквозь неё видно анимированный фон */
+.section--alt {
+  background: var(--surface-2);
+  backdrop-filter: blur(18px) saturate(1.08);
+  -webkit-backdrop-filter: blur(18px) saturate(1.08);
+  border-block: 1px solid var(--line);
+}
+
+.section__title {
+  position: relative;
+  padding-bottom: 20px;
+  font-size: clamp(28px, 4vw, 38px);
+  margin-bottom: 28px;
+}
+
+/* Акцентная черта под заголовком вырастает при появлении */
+.section__title::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 0;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--accent), #E8A87C);
+  transition: width .85s cubic-bezier(.16, .84, .44, 1) .12s;
+}
+.section__title.is-in::after { width: 56px; }
+
+.section__lead {
+  max-width: 66ch;
+  margin-top: 28px;
+  color: var(--ink-soft);
+}
+.section__lead--wide { margin-top: -8px; margin-bottom: 12px; }
+.section__lead strong { color: var(--ink); font-weight: 600; }
+
+/* ---------- 4. ШАПКА ---------- */
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: rgba(250, 248, 245, .82);
+  backdrop-filter: blur(14px) saturate(1.1);
+  -webkit-backdrop-filter: blur(14px) saturate(1.1);
+  border-bottom: 1px solid transparent;
+  transition: border-color .2s ease, background .2s ease;
+}
+.header.is-stuck {
+  border-bottom-color: var(--line);
+  background: rgba(250, 248, 245, .95);
+}
+
+.header__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--gap);
+  min-height: 72px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  color: var(--ink);
+  flex-shrink: 0;
+}
+.logo:hover { color: var(--ink); }
+
+.logo__mark {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: .02em;
+}
+
+.logo__text {
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.18;
+  letter-spacing: .01em;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.nav__link {
+  padding: 9px 14px;
+  border-radius: 999px;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--ink-soft);
+  white-space: nowrap;
+  transition: background .18s ease, color .18s ease;
+}
+.nav__link:hover { background: var(--accent-soft); color: var(--accent-ink); }
+
+.nav__link.is-active {
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+  font-weight: 600;
+}
+
+.nav__link--cta {
+  background: var(--accent);
+  color: #fff;
+  font-weight: 600;
+  margin-left: 6px;
+}
+.nav__link--cta:hover { background: var(--accent-ink); color: #fff; }
+.nav__link--cta.is-active { background: var(--accent-ink); color: #fff; }
+
+.nav__burger {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 42px;
+  height: 42px;
+  padding: 0 10px;
+  background: none;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+.nav__burger span {
+  display: block;
+  height: 2px;
+  background: var(--ink);
+  border-radius: 2px;
+  transition: transform .22s ease, opacity .22s ease;
+}
+.nav__burger[aria-expanded="true"] span:nth-child(1) { transform: translateY(7px)  rotate(45deg); }
+.nav__burger[aria-expanded="true"] span:nth-child(2) { opacity: 0; }
+.nav__burger[aria-expanded="true"] span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+/* ---------- 5. ПЕРВЫЙ ЭКРАН ---------- */
+.hero {
+  padding: clamp(60px, 9vw, 112px) 0 clamp(48px, 6vw, 76px);
+}
+
+.hero__eyebrow {
+  margin-bottom: 18px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.hero__title {
+  max-width: 19ch;
+  font-size: clamp(34px, 6.2vw, 58px);
+}
+
+.hero__lead {
+  max-width: 60ch;
+  margin-top: 24px;
+  font-size: clamp(17px, 2.1vw, 20px);
+  color: var(--ink-soft);
+}
+
+.hero__note {
+  max-width: 56ch;
+  margin-top: 18px;
+  padding: 12px 18px;
+  border-left: 2px solid var(--accent);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  background: var(--accent-soft);
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 36px;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 40px;
+}
+
+.chip {
+  padding: 6px 13px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  font-size: 14px;
+  color: var(--ink-soft);
+}
+
+/* ---------- 6. КОМПОНЕНТЫ ---------- */
+
+/* Кнопки */
+.btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 13px 24px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.2;
+  cursor: pointer;
+  overflow: hidden;
+  isolation: isolate;
+  transition: transform .2s cubic-bezier(.2, .8, .3, 1), box-shadow .2s ease,
+              background .2s ease, border-color .2s ease, color .2s ease;
+}
+
+/* Блик, пробегающий по кнопке при наведении */
+.btn::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(100deg, transparent 20%, rgba(255, 255, 255, .38) 50%, transparent 80%);
+  transform: translateX(-120%);
+  transition: transform .65s cubic-bezier(.2, .8, .3, 1);
+}
+.btn:hover::after { transform: translateX(120%); }
+
+.btn--primary {
+  background: var(--accent);
+  color: #fff;
+  box-shadow: 0 2px 10px rgba(179, 80, 42, .28);
+}
+.btn--primary:hover {
+  background: var(--accent-ink);
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(179, 80, 42, .38);
+}
+
+.btn--ghost {
+  background: var(--surface);
+  border-color: var(--line);
+  color: var(--ink);
+}
+.btn--ghost:hover {
+  border-color: var(--accent);
+  color: var(--accent-ink);
+  background: #fff;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn--lg {
+  padding: 16px 32px;
+  font-size: 16px;
+  box-shadow: 0 3px 14px rgba(179, 80, 42, .32);
+}
+
+.btn:active { transform: translateY(0) scale(.98); }
+
+/* Мягкое пятно-подсветка под основной кнопкой */
+.btn--primary::before {
+  content: "";
+  position: absolute;
+  inset: -40%;
+  z-index: -2;
+  background: radial-gradient(circle, rgba(232, 168, 124, .5), transparent 62%);
+  opacity: 0;
+  transition: opacity .3s ease;
+}
+.btn--primary:hover::before { opacity: 1; }
+
+/* Карточки услуг */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(232px, 1fr));
+  gap: 16px;
+}
+
+.card {
+  padding: 26px 24px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+}
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+  border-color: #D9D3C9;
+}
+
+.card__title {
+  margin-bottom: 10px;
+  font-size: 18px;
+}
+
+.card__text { color: var(--ink-soft); font-size: 16px; }
+
+/* Блок «Почему я» */
+.reasons { display: grid; gap: 18px; }
+
+.reason {
+  padding: 28px 26px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+}
+
+.reason__title {
+  margin-bottom: 12px;
+  font-size: 20px;
+}
+
+.reason__text { color: var(--ink-soft); max-width: 68ch; }
+
+.stack {
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px dashed var(--line);
+  font-size: 15px;
+  line-height: 1.75;
+  color: var(--muted);
+}
+
+.stack__label {
+  display: inline-block;
+  margin-right: 10px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.about__photo { margin-bottom: 32px; }
+.about__photo img {
+  width: 168px;
+  height: 168px;
+  object-fit: cover;
+  border-radius: 20px;
+  box-shadow: var(--shadow-sm);
+}
+
+/* ---------- РАБОТЫ ---------- */
+
+.works__label {
+  margin: 52px 0 18px;
+  font-size: clamp(17px, 2.2vw, 21px);
+  font-weight: 650;
+  letter-spacing: -.01em;
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+/* Короткая черта после названия группы */
+.works__label::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, var(--line), transparent);
+}
+
+.works-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(268px, 1fr));
+  gap: 18px;
+}
+.works-grid--video   { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+.works-grid--visual  { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+
+.work {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;
+}
+.work:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); border-color: #D9D3C9; }
+
+/* Обложка */
+.work__cover {
+  position: relative;
+  display: block;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  background: var(--accent-soft);
+  border-bottom: 1px solid var(--line);
+}
+.work__cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform .45s cubic-bezier(.2, .8, .3, 1);
+}
+.work:hover .work__cover img { transform: scale(1.05); }
+
+/* Значок «открыть» на картинках */
+.work__zoom {
+  position: absolute;
+  right: 14px;
+  bottom: 14px;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, .92);
+  box-shadow: 0 2px 10px rgba(22, 24, 29, .18);
+  transition: transform .22s ease, background .22s ease;
+}
+.work__zoom::before,
+.work__zoom::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  background: var(--accent);
+  border-radius: 2px;
+  transform: translate(-50%, -50%);
+}
+.work__zoom::before { width: 15px; height: 2px; }
+.work__zoom::after  { width: 2px;  height: 15px; }
+.work:hover .work__zoom { transform: scale(1.1); background: #fff; }
+
+/* Обложка документа: рисуем сами, файл открывается по клику */
+.work__cover--doc {
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 4px;
+  background:
+    linear-gradient(150deg, rgba(179, 80, 42, .13), rgba(159, 194, 201, .16)),
+    var(--surface);
+}
+.doc__fmt {
+  font-size: clamp(28px, 4.4vw, 38px);
+  font-weight: 700;
+  letter-spacing: .07em;
+  color: var(--accent-ink);
+  opacity: .8;
+  transition: transform .22s ease;
+}
+.work:hover .doc__fmt { transform: scale(1.06); }
+.doc__size { font-size: 13px; color: var(--muted); }
+
+/* Видео */
+.work--video { min-width: 0; }
+
+.vframe {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  background: var(--night);
+  border-bottom: 1px solid var(--line);
+}
+
+/* Файл не выложен на хостинг — рамка становится честной плашкой
+   вместо чёрного квадрата с мёртвым плеером */
+.vframe.is-missing {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: auto;
+  min-height: 132px;
+  background: var(--surface-2);
+}
+.vframe.is-missing > * { display: none; }
+.vframe.is-missing::after {
+  content: "Видео не загружено";
+  font-size: 13px;
+  color: var(--muted);
+  letter-spacing: .01em;
+}
+.vframe__video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: var(--night);
+}
+
+/* Подложка с кнопкой play до начала просмотра */
+.vframe__poster {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  cursor: pointer;
+  background:
+    radial-gradient(ellipse at 50% 40%, rgba(179, 80, 42, .3), transparent 62%),
+    linear-gradient(180deg, rgba(14, 16, 20, .25) 0%, rgba(14, 16, 20, .8) 100%);
+  transition: opacity .35s ease;
+}
+.vframe__poster[hidden] { display: none; }
+
+.vframe__play {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 66px;
+  height: 66px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 8px 26px rgba(0, 0, 0, .45);
+  transition: transform .25s ease, background .25s ease;
+}
+.vframe__play::after {
+  content: "";
+  width: 0;
+  height: 0;
+  margin-left: 5px;
+  border-left: 17px solid #fff;
+  border-top: 10px solid transparent;
+  border-bottom: 10px solid transparent;
+}
+.vframe__poster:hover .vframe__play {
+  transform: scale(1.12);
+  background: var(--accent-ink);
+}
+
+/* Пульсирующее кольцо вокруг play */
+.vframe__play::before {
+  content: "";
+  position: absolute;
+  inset: -9px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, .5);
+  animation: ring 2.4s ease-out infinite;
+}
+
+@keyframes ring {
+  0%   { transform: scale(.9); opacity: .9; }
+  100% { transform: scale(1.35); opacity: 0; }
+}
+
+.vframe__hint {
+  position: relative;
+  z-index: 1;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: .01em;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, .7);
+}
+
+.vframe__badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 2;
+  padding: 5px 11px;
+  border-radius: 999px;
+  background: rgba(14, 16, 20, .62);
+  backdrop-filter: blur(6px);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .04em;
+}
+
+/* Текст карточки */
+.work__body { padding: 20px 22px 22px; }
+
+.work__tag {
+  display: inline-block;
+  margin-bottom: 10px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+}
+
+.work__title {
+  margin-bottom: 7px;
+  font-size: 17px;
+  line-height: 1.34;
+}
+
+.work__text { color: var(--muted); font-size: 15px; }
+
+/* Презентация или картинка не выложена: гасим обложку и подсказываем
+   причину, чтобы карточка не выглядела сломанной */
+.work.is-missing .doc,
+.work.is-missing .doc__fmt,
+.work.is-missing .doc__size { opacity: .35; }
+.work.is-missing [aria-disabled="true"] { pointer-events: none; }
+
+.work__missing {
+  display: block;
+  margin-top: 12px;
+  padding-top: 11px;
+  border-top: 1px dashed var(--line);
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.works__more {
+  max-width: 62ch;
+  margin-top: 40px;
+  padding: 20px 22px;
+  border: 1px dashed var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--ink-soft);
+  font-size: 16px;
+}
+
+/* Таблица сроков */
+.table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.table {
+  width: 100%;
+  min-width: 420px;
+  border-collapse: collapse;
+  font-size: 16px;
+}
+
+.table th, .table td {
+  padding: 15px 20px;
+  text-align: left;
+  border-bottom: 1px solid var(--line);
+}
+
+.table thead th {
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.table tbody tr:last-child td { border-bottom: none; }
+.table tbody tr:hover { background: rgba(255, 255, 255, .6); }
+.table td:last-child { color: var(--ink); font-weight: 600; white-space: nowrap; }
+
+/* Контакт */
+.section--contact { background: var(--surface-2); }
+
+.contact {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 32px 48px;
+  margin-top: 36px;
+}
+
+.contact__cta { display: grid; gap: 10px; justify-items: start; }
+
+.contact__hint {
+  min-height: 20px;
+  font-size: 14px;
+  color: var(--accent-ink);
+}
+.contact__hint:empty { min-height: 0; }
+
+/* Кнопка Telegram, пока username не заменён */
+#tg-link.is-pending {
+  background: var(--surface);
+  border-color: var(--line);
+  color: var(--muted);
+  box-shadow: none;
+  cursor: not-allowed;
+}
+#tg-link.is-pending:hover { transform: none; box-shadow: none; }
+
+.contact__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 28px 44px;
+}
+.contact__list li { display: grid; gap: 2px; }
+
+.contact__label {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.contact__list a { font-size: 17px; font-weight: 500; word-break: break-word; }
+
+/* ---------- ПРОСМОТР ФАЙЛА ПОВЕРХ СТРАНИЦЫ ---------- */
+
+/* Пока открыт просмотр, страница под ним не прокручивается.
+   scrollbar-gutter резервирует место под полосу прокрутки заранее,
+   иначе при открытии страница дёргалась бы вбок. */
+body.is-locked { overflow: hidden; }
+
+.viewer {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: grid;
+  place-items: center;
+  padding: clamp(12px, 3vw, 40px);
+}
+.viewer[hidden] { display: none; }
+
+.viewer__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(14, 16, 20, .62);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  animation: fadeIn .22s ease both;
+}
+
+.viewer__panel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: min(100%, 1000px);
+  max-height: 100%;
+  overflow: hidden;
+  background: #fff;
+  border-radius: var(--radius);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, .4);
+  animation: popIn .28s cubic-bezier(.16, .84, .44, 1) both;
+}
+
+.viewer__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-shrink: 0;
+  padding: 14px 16px 14px 22px;
+  background: var(--bg);
+  border-bottom: 1px solid var(--line);
+}
+
+.viewer__heading { min-width: 0; }
+
+.viewer__title {
+  font-size: 17px;
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.viewer__note {
+  margin-top: 2px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.viewer__tools {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.viewer__open {
+  padding: 8px 15px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: border-color .2s ease, color .2s ease;
+}
+.viewer__open:hover { border-color: var(--accent); color: var(--accent-ink); }
+
+.viewer__close {
+  position: relative;
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: #fff;
+  cursor: pointer;
+  transition: background .2s ease, border-color .2s ease, transform .2s ease;
+}
+.viewer__close::before,
+.viewer__close::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 15px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--ink);
+}
+.viewer__close::before { transform: translate(-50%, -50%) rotate(45deg); }
+.viewer__close::after  { transform: translate(-50%, -50%) rotate(-45deg); }
+.viewer__close:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+  transform: rotate(90deg);
+}
+.viewer__close:hover::before,
+.viewer__close:hover::after { background: #fff; }
+
+/* Содержимое: PDF во весь размер, картинка вписывается целиком */
+.viewer__body {
+  flex: 1;
+  min-height: 240px;
+  overflow: auto;
+  background: #EDE9E3;
+}
+
+.viewer__frame {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 70vh;
+  border: 0;
+  background: #fff;
+}
+
+.viewer__img {
+  display: block;
+  max-width: 100%;
+  max-height: 82vh;
+  margin-inline: auto;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes popIn {
+  from { opacity: 0; transform: translateY(18px) scale(.97); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* ---------- ПОДВАЛ ---------- */
+.footer {
+  padding: 30px 0;
+  border-top: 1px solid var(--line);
+  background: var(--surface-2);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.footer__inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.footer__note { font-style: italic; }
+
+/* ---------- АНИМАЦИЯ И ФОН ---------- */
+
+/* Фон: сетка + плывущие пятна + свечение */
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+  background: var(--bg);
+}
+
+.backdrop__grid {
+  position: absolute;
+  inset: -2px;
+  background-image:
+    linear-gradient(to right, rgba(179, 80, 42, .06) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(179, 80, 42, .06) 1px, transparent 1px);
+  background-size: 68px 68px;
+  -webkit-mask-image: radial-gradient(ellipse 95% 75% at 50% 0%, #000 5%, transparent 78%);
+          mask-image: radial-gradient(ellipse 95% 75% at 50% 0%, #000 5%, transparent 78%);
+  animation: gridDrift 34s linear infinite;
+}
+
+.backdrop__orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(90px);
+  opacity: .5;
+  will-change: transform;
+}
+
+.backdrop__orb--1 {
+  width: 620px;
+  height: 620px;
+  top: -180px;
+  left: -140px;
+  background: radial-gradient(circle, #E8A87C 0%, transparent 68%);
+  animation: float1 26s ease-in-out infinite;
+}
+
+.backdrop__orb--2 {
+  width: 540px;
+  height: 540px;
+  top: 8%;
+  right: -160px;
+  background: radial-gradient(circle, #9FC2C9 0%, transparent 68%);
+  animation: float2 32s ease-in-out infinite;
+}
+
+.backdrop__orb--3 {
+  width: 700px;
+  height: 700px;
+  bottom: -260px;
+  left: 22%;
+  background: radial-gradient(circle, #D8B4A0 0%, transparent 70%);
+  animation: float3 38s ease-in-out infinite;
+}
+
+.backdrop__glow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 60% 40% at 50% 0%, rgba(179, 80, 42, .1), transparent 70%);
+  animation: pulse 11s ease-in-out infinite;
+}
+
+@keyframes float1 {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50%      { transform: translate3d(90px, 70px, 0) scale(1.12); }
+}
+@keyframes float2 {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1.05); }
+  50%      { transform: translate3d(-110px, 90px, 0) scale(.92); }
+}
+@keyframes float3 {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(.95); }
+  50%      { transform: translate3d(70px, -80px, 0) scale(1.1); }
+}
+@keyframes pulse {
+  0%, 100% { opacity: .55; }
+  50%      { opacity: 1; }
+}
+@keyframes gridDrift {
+  from { background-position: 0 0, 0 0; }
+  to   { background-position: 68px 68px, 68px 68px; }
+}
+
+/* Полоса прогресса чтения */
+.progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  z-index: 60;
+  background: transparent;
+  pointer-events: none;
+}
+
+.progress__bar {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent) 0%, #E8A87C 100%);
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  transition: transform .1s linear;
+}
+
+/* Появление при скролле */
+[data-rise] {
+  opacity: 0;
+  transform: translate3d(0, 26px, 0);
+  transition:
+    opacity .7s cubic-bezier(.16, .84, .44, 1) var(--d, 0ms),
+    transform .7s cubic-bezier(.16, .84, .44, 1) var(--d, 0ms);
+  will-change: opacity, transform;
+}
+[data-rise].is-in {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+/* ---------- АДАПТИВ ---------- */
+
+/* До 680px пять ссылок в шапке ещё помещаются, поэтому сворачиваем
+   меню только когда они реально перестают влезать. */
+@media (max-width: 680px) {
+  html { scroll-padding-top: 76px; }
+  body { font-size: 16px; }
+
+  .nav__burger { display: flex; }
+
+  .nav {
+    position: absolute;
+    top: 100%;
+    left: 16px;
+    right: 16px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 2px;
+    padding: 10px;
+    background: var(--surface);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-md);
+    display: none;
+  }
+  .nav.is-open { display: flex; }
+
+  .nav__link { padding: 12px 14px; border-radius: var(--radius-sm); }
+  .nav__link--cta {
+    display: block;
+    margin: 6px 0 0;
+    text-align: center;
+    border-radius: var(--radius-sm);
+  }
+
+  .hero__actions .btn { flex: 1 1 100%; }
+
+  .footer__inner { flex-direction: column; align-items: flex-start; }
+
+  /* фон мельче, чтобы пятна не съедали узкий экран */
+  .backdrop__grid { background-size: 48px 48px; }
+  .backdrop__orb--1 { width: 380px; height: 380px; }
+  .backdrop__orb--2 { width: 340px; height: 340px; }
+  .backdrop__orb--3 { width: 420px; height: 420px; }
+}
+
+@media (max-width: 560px) {
+  .vframe { aspect-ratio: 3 / 4; }
+  .vframe__play { width: 58px; height: 58px; }
+  .vframe__play::after {
+    border-left-width: 15px;
+    border-top-width: 9px;
+    border-bottom-width: 9px;
+  }
+  .vframe__hint { font-size: 13px; }
+
+  .contact { gap: 24px; }
+  .contact__list { gap: 20px 32px; }
+  .table th, .table td { padding: 13px 16px; }
+}
+
+@media (max-width: 460px) {
+  .container { padding-inline: 18px; }
+  .card, .reason { padding: 22px 20px; }
+  .work__body { padding: 18px 18px 20px; }
+  .chips { margin-top: 30px; }
+  .works__label { margin-top: 40px; }
+}
+
+/* ---------- ДОСТУПНОСТЬ: меньше движения ---------- */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+
+  /* Фон оставляем статичным, но не пустым */
+  .backdrop__orb,
+  .backdrop__grid,
+  .backdrop__glow { animation: none !important; }
+
+  /* Иначе контент останется невидимым */
+  [data-rise] { opacity: 1 !important; transform: none !important; }
+  .section__title::after { width: 56px !important; }
+}
+
+/* Экономия ресурсов: фон замирает, когда вкладка не в фокусе */
+.backdrop.is-paused .backdrop__orb,
+.backdrop.is-paused .backdrop__grid,
+.backdrop.is-paused .backdrop__glow { animation-play-state: paused; }
+
+/* ---------- ПЕЧАТЬ ---------- */
+@media print {
+  .header, .hero__actions, .backdrop, .progress, .vframe__poster { display: none; }
+  body { background: #fff; font-size: 12pt; }
+  .section { padding: 18pt 0; page-break-inside: avoid; }
+  .section--alt, .section--contact, .footer { background: #fff; }
+  .work { break-inside: avoid; }
+  a { color: #000; }
+}
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     ОСТАЛОСЬ ПЕРЕД ПУБЛИКАЦИЕЙ
+     1. Фото (по желанию): положите файл в assets/photo.jpg
+        и раскомментируйте блок в секции "Почему я"
+        (см. .about__photo)
+     Контакты уже заполнены: t.me/gulya_recruiter и 6403774@gmail.com
+     ============================================================ -->
+
+<a class="skip-link" href="#main">Перейти к содержанию</a>
+
+<!-- Полоса прогресса чтения -->
+<div class="progress" aria-hidden="true">
+  <span class="progress__bar" id="progress-bar"></span>
+</div>
+
+<!-- Анимированный фон: сетка + плывущие пятна + свечение -->
+<div class="backdrop" aria-hidden="true">
+  <span class="backdrop__grid"></span>
+  <span class="backdrop__orb backdrop__orb--1"></span>
+  <span class="backdrop__orb backdrop__orb--2"></span>
+  <span class="backdrop__orb backdrop__orb--3"></span>
+  <span class="backdrop__glow"></span>
+</div>
+
+<header class="header" id="header">
+  <div class="container header__inner">
+
+    <a class="logo" href="#top">
+      <span class="logo__mark" aria-hidden="true">GC</span>
+      <span class="logo__text">Gulnara<br>Creates</span>
+    </a>
+
+    <nav class="nav" id="nav" aria-label="Основная навигация">
+      <a class="nav__link" href="#services">Услуги</a>
+      <a class="nav__link" href="#why">Почему я</a>
+      <a class="nav__link" href="#works">Работы</a>
+      <a class="nav__link" href="#timing">Сроки</a>
+      <a class="nav__link nav__link--cta" href="#contact">Обсудить задачу</a>
+      <button class="nav__burger" id="burger" type="button"
+              aria-label="Открыть меню" aria-expanded="false" aria-controls="nav">
+        <span></span><span></span><span></span>
+      </button>
+    </nav>
+
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- ============ ПЕРВЫЙ ЭКРАН ============ -->
+  <section class="hero" id="top">
+    <div class="container">
+
+      <p class="hero__eyebrow" data-rise>Gulnara Creates</p>
+
+      <h1 class="hero__title" data-rise style="--d:60ms">
+        Тексты, визуалы и короткие видео для&nbsp;HR и&nbsp;бизнеса
+      </h1>
+
+      <p class="hero__lead" data-rise style="--d:130ms">
+        18 лет в HR и рекрутинге, включая сложные технические отрасли.
+        Перевожу профессиональную информацию в понятные материалы —
+        для кандидатов, сотрудников и клиентов.
+      </p>
+
+      <p class="hero__note" data-rise style="--d:200ms">
+        ИИ — на этапе подготовки. Смысл, содержание и качество — в моей работе.
+      </p>
+
+      <div class="hero__actions" data-rise style="--d:270ms">
+        <a class="btn btn--primary" href="#contact">Обсудить задачу</a>
+        <a class="btn btn--ghost" href="#works">Смотреть работы</a>
+      </div>
+
+      <ul class="chips" data-rise style="--d:340ms">
+        <li class="chip">18 лет в найме</li>
+        <li class="chip">Видео до 60 секунд</li>
+        <li class="chip">ИИ + ручная доработка</li>
+      </ul>
+
+    </div>
+  </section>
+
+  <!-- ============ ЧТО ДЕЛАЮ ============ -->
+  <section class="section" id="services">
+    <div class="container">
+
+      <h2 class="section__title" data-rise>Что я делаю</h2>
+
+      <div class="cards">
+        <article class="card" data-rise>
+          <h3 class="card__title">Тексты</h3>
+          <p class="card__text">Вакансии, посты для HR-каналов, коммерческие и SEO-тексты, письма, сценарии, презентации.</p>
+        </article>
+
+        <article class="card" data-rise style="--d:70ms">
+          <h3 class="card__title">Визуалы</h3>
+          <p class="card__text">Карточки, афиши, баннеры, обложки, мудборды. С нуля или доработка ваших материалов.</p>
+        </article>
+
+        <article class="card" data-rise style="--d:140ms">
+          <h3 class="card__title">Видео до 60 секунд</h3>
+          <p class="card__text">Видеовакансии, презентации работодателя, экспертные ролики, анонсы.</p>
+        </article>
+
+        <article class="card" data-rise style="--d:210ms">
+          <h3 class="card__title">Лид-магниты</h3>
+          <p class="card__text">Чек-листы, гайды и мини-PDF, которые приводят людей в диалог.</p>
+        </article>
+      </div>
+
+      <p class="section__lead" data-rise>
+        <strong>Кому:</strong> HR-специалистам, рекрутерам, HRBP, руководителям
+        подбора и HR-директорам. Образовательным проектам, организаторам
+        мероприятий, малому и частному бизнесу.
+      </p>
+
+    </div>
+  </section>
+
+  <!-- ============ ПОЧЕМУ Я ============ -->
+  <section class="section section--alt" id="why">
+    <div class="container">
+
+      <h2 class="section__title" data-rise>Почему я</h2>
+
+      <!-- Раскомментируйте, когда появится фото:
+      <div class="about__photo" data-rise>
+        <img src="assets/photo.jpg" alt="Gulnara Creates">
+      </div>
+      -->
+
+      <div class="reasons">
+
+        <article class="reason" data-rise>
+          <h3 class="reason__title">HR-изнутри, а не со стороны</h3>
+          <p class="reason__text">
+            Ракетно-космическая отрасль, машиностроение и двигателестроение,
+            промышленное производство, нефтегазовое строительство, инжиниринг.
+            Знаю, как устроен найм и какие задачи бьют по HR-службам
+            в реальных компаниях.
+          </p>
+        </article>
+
+        <article class="reason" data-rise style="--d:90ms">
+          <h3 class="reason__title">ИИ ускоряет, но не заменяет</h3>
+          <p class="reason__text">
+            ИИ даёт черновики, изображения, видеосцены, субтитры и обработку
+            звука. Содержание, формулировки, факты и финальное качество —
+            моя работа.
+          </p>
+          <p class="stack">
+            <span class="stack__label">Стек</span>
+            ChatGPT, Qwen · Midjourney, Kandinsky · Kling, WAN, Hailuo ·
+            Magic Hour, Vidnoz · CapCut · Suno · Canva · Gamma · Notion, Trello
+          </p>
+        </article>
+
+        <article class="reason" data-rise style="--d:180ms">
+          <h3 class="reason__title">Сначала вопросы, потом текст</h3>
+          <p class="reason__text">
+            Проект начинается с разговора: кому адресован материал,
+            что человек должен понять и какое действие совершить.
+            Дальше — техническое задание, концепция, работа, правки.
+          </p>
+        </article>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============ РАБОТЫ ============ -->
+  <section class="section" id="works">
+    <div class="container">
+
+      <h2 class="section__title" data-rise>Работы</h2>
+
+      <p class="section__lead section__lead--wide" data-rise>
+        Учебные проекты. Сделаны, чтобы отработать подход от брифа
+        до готового файла. Файлы открываются прямо здесь. В коммерческих
+        работах процесс тот же.
+      </p>
+
+      <!-- ---------- Видео ---------- -->
+      <h3 class="works__label" data-rise>Видео</h3>
+
+      <div class="works-grid works-grid--video">
+
+        <article class="work work--video" data-rise>
+          <div class="vframe">
+            <video class="vframe__video" data-video
+                   controls preload="metadata" playsinline
+                   aria-label="Вертикальный ролик для HR">
+              <source src="video_HR/hr-video.mp4" type="video/mp4">
+              Ваш браузер не поддерживает видео.
+            </video>
+            <button class="vframe__poster" data-play type="button" aria-label="Смотреть ролик">
+              <span class="vframe__play" aria-hidden="true"></span>
+              <span class="vframe__hint">Смотреть</span>
+            </button>
+            <span class="vframe__badge">18 сек · 1080×1920</span>
+          </div>
+          <div class="work__body">
+            <span class="work__tag">HR · видео</span>
+            <h4 class="work__title">Вертикальный ролик для HR</h4>
+            <p class="work__text">
+              Формат 9:16, 18 секунд. Сценарий, кадры, монтаж, субтитры.
+              Файл 28 МБ, поэтому загружается после нажатия.
+            </p>
+          </div>
+        </article>
+
+        <article class="work work--video" data-rise style="--d:90ms">
+          <div class="vframe">
+            <video class="vframe__video" data-video
+                   controls preload="metadata" playsinline
+                   aria-label="Постер с музыкой">
+              <!-- Ролик берём с GitHub. Браузер читает строки сверху вниз
+                   и берёт первую, что загрузилась:
+                   1) прямая ссылка на файл в репозитории — работает на сайте;
+                   2) тот же файл из корня — если страницу открыли с диска;
+                   3) копия рядом со страницей — последний запасной вариант. -->
+              <source src="https://raw.githubusercontent.com/nara020250-ux/site/main/Постер с музыкой.mp4"
+                      type="video/mp4">
+              <source src="Постер с музыкой.mp4" type="video/mp4">
+              <source src="video_HR/Постер с музыкой.mp4" type="video/mp4">
+              Ваш браузер не поддерживает видео.
+            </video>
+            <button class="vframe__poster" data-play type="button" aria-label="Смотреть ролик">
+              <span class="vframe__play" aria-hidden="true"></span>
+              <span class="vframe__hint">Смотреть</span>
+            </button>
+            <span class="vframe__badge">7 сек · 720×720</span>
+          </div>
+          <div class="work__body">
+            <span class="work__tag">Визуал · видео</span>
+            <h4 class="work__title">Постер с музыкой</h4>
+            <p class="work__text">
+              Короткий квадратный ролик-плашка, 7 секунд. Статичный кадр
+              с музыкой — для ленты, где видео не любят.
+            </p>
+          </div>
+        </article>
+
+      </div>
+
+      <!-- ---------- Презентации и PDF ---------- -->
+      <h3 class="works__label" data-rise>Презентации и PDF</h3>
+
+      <div class="works-grid">
+
+        <article class="work" data-rise>
+          <a class="work__cover work__cover--doc" href="prezent_HR/Презентация консалтинг в HR.pdf"
+             target="_blank" rel="noopener" aria-label="PDF 9,8 МБ — Презентация консалтинга в HR"
+             data-viewer="pdf" data-title="Презентация консалтинга в HR" data-note="PDF · 9,8 МБ">
+            <span class="doc__fmt">PDF</span>
+            <span class="doc__size">9,8 МБ</span>
+          </a>
+          <div class="work__body">
+            <span class="work__tag">HR · PDF</span>
+            <h4 class="work__title">Презентация консалтинга в HR</h4>
+            <p class="work__text">Разбор задачи и пути её решения. 9,8 МБ — много иллюстраций.</p>
+          </div>
+        </article>
+
+        <article class="work" data-rise style="--d:70ms">
+          <a class="work__cover work__cover--doc" href="prezent_HR/Презентация интерьерной концепции.pdf"
+             target="_blank" rel="noopener" aria-label="PDF 1,7 МБ — Презентация интерьерной концепции"
+             data-viewer="pdf" data-title="Презентация интерьерной концепции" data-note="PDF · 1,7 МБ">
+            <span class="doc__fmt">PDF</span>
+            <span class="doc__size">1,7 МБ</span>
+          </a>
+          <div class="work__body">
+            <span class="work__tag">Дизайн · PDF</span>
+            <h4 class="work__title">Презентация интерьерной концепции</h4>
+            <p class="work__text">Показ концепции: решения, материалы, визуализации.</p>
+          </div>
+        </article>
+
+        <article class="work" data-rise style="--d:140ms">
+          <a class="work__cover work__cover--doc" href="prezent_HR/Проект Чек-лист, гайд.pdf"
+             target="_blank" rel="noopener" aria-label="PDF 606 КБ — Чек-лист и гайд"
+             data-viewer="pdf" data-title="Чек-лист и гайд" data-note="PDF · 606 КБ">
+            <span class="doc__fmt">PDF</span>
+            <span class="doc__size">606 КБ</span>
+          </a>
+          <div class="work__body">
+            <span class="work__tag">HR · лид-магнит</span>
+            <h4 class="work__title">Чек-лист и гайд</h4>
+            <p class="work__text">Компактный материал, который удобно переслать и заполнить.</p>
+          </div>
+        </article>
+
+      </div>
+
+      <!-- ---------- Визуалы ---------- -->
+      <h3 class="works__label" data-rise>Визуалы</h3>
+
+      <div class="works-grid works-grid--visual">
+
+        <article class="work" data-rise>
+          <a class="work__cover" href="prezent_HR/Проектирование гардероба Мудборды. Капсулы. Лукбуки.png"
+             target="_blank" rel="noopener" aria-label="Смотреть: Мудборды, капсулы, лукбуки"
+             data-viewer="image" data-title="Мудборды, капсулы, лукбуки" data-note="1536 × 1024">
+            <img src="prezent_HR/Проектирование гардероба Мудборды. Капсулы. Лукбуки.png"
+                 alt="Мудборды, капсулы и лукбуки — проектирование гардеробной" loading="lazy" width="1536" height="1024">
+            <span class="work__zoom" aria-hidden="true"></span>
+          </a>
+          <div class="work__body">
+            <span class="work__tag">Визуал · мудборд</span>
+            <h4 class="work__title">Мудборды, капсулы, лукбуки</h4>
+            <p class="work__text">Проектирование гардеробной: визуальные ориентиры и готовые комплекты.</p>
+          </div>
+        </article>
+
+        <article class="work" data-rise style="--d:90ms">
+          <a class="work__cover" href="prezent_HR/Проект оформление карточки для маркетплейса.png"
+             target="_blank" rel="noopener" aria-label="Смотреть: Карточка для маркетплейса"
+             data-viewer="image" data-title="Карточка для маркетплейса" data-note="1254 × 1254">
+            <img src="prezent_HR/Проект оформление карточки для маркетплейса.png"
+                 alt="Оформление карточки товара для маркетплейса" loading="lazy" width="1254" height="1254">
+            <span class="work__zoom" aria-hidden="true"></span>
+          </a>
+          <div class="work__body">
+            <span class="work__tag">Визуал · карточка</span>
+            <h4 class="work__title">Карточка для маркетплейса</h4>
+            <p class="work__text">Учебный проект для частного бизнеса: композиция, акцент, читаемость.</p>
+          </div>
+        </article>
+
+      </div>
+
+      <p class="works__more" data-rise>
+        Остальные учебные проекты — тексты, видеовакансии, афиши для мероприятий —
+        готова показать на созвоне или прислать по запросу.
+      </p>
+
+    </div>
+  </section>
+
+  <!-- ============ СРОКИ ============ -->
+  <section class="section section--alt" id="timing">
+    <div class="container">
+
+      <h2 class="section__title" data-rise>Сроки</h2>
+
+      <div class="table-wrap" data-rise>
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">Материал</th>
+              <th scope="col">Срок</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Пост или описание услуги</td>
+              <td>1–2 рабочих дня</td>
+            </tr>
+            <tr>
+              <td>Визуал, карточка, афиша</td>
+              <td>1–3 рабочих дня</td>
+            </tr>
+            <tr>
+              <td>Видео до 60 секунд из готовых исходников</td>
+              <td>3–5 рабочих дней</td>
+            </tr>
+            <tr>
+              <td>Видео с генерацией сцен или аватаром</td>
+              <td>5–7 рабочих дней</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p class="section__lead" data-rise>
+        Ориентировочно, уточняю после изучения задачи. Зависит от исходников,
+        сложности и количества правок. Время ожидания материалов и обратной
+        связи согласуем отдельно.
+      </p>
+
+    </div>
+  </section>
+
+  <!-- ============ КОНТАКТ ============ -->
+  <section class="section section--contact" id="contact">
+    <div class="container">
+
+      <h2 class="section__title" data-rise>Обсудим вашу задачу?</h2>
+
+      <p class="section__lead" data-rise>
+        Напишите, что нужно сделать — отвечу с уточняющими вопросами,
+        сроками и стоимостью.
+      </p>
+
+      <div class="contact" data-rise>
+
+        <div class="contact__cta">
+          <a class="btn btn--primary btn--lg" id="tg-link" href="#">Написать в Telegram</a>
+          <p class="contact__hint" id="tg-hint" role="status"></p>
+        </div>
+
+        <ul class="contact__list">
+          <li>
+            <span class="contact__label">Telegram</span>
+            <a href="https://t.me/gulya_recruiter">@gulya_recruiter</a>
+          </li>
+          <li>
+            <span class="contact__label">Email</span>
+            <a href="mailto:6403774@gmail.com">6403774@gmail.com</a>
+          </li>
+        </ul>
+
+      </div>
+
+    </div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <div class="container footer__inner">
+    <p>© 2026 Gulnara Creates. Тексты, визуалы и короткие видео.</p>
+    <p class="footer__note">Учебный проект</p>
+  </div>
+</footer>
+
+<!-- Просмотр файла поверх страницы: PDF и картинки открываются здесь же,
+     без перехода в новую вкладку. Если скрипт выключен, ссылки в карточках
+     остаются обычными и открывают файл как раньше. -->
+<div class="viewer" id="viewer" hidden>
+  <div class="viewer__backdrop" data-viewer-close></div>
+  <div class="viewer__panel" role="dialog" aria-modal="true" aria-labelledby="viewer-title">
+    <div class="viewer__bar">
+      <div class="viewer__heading">
+        <h3 class="viewer__title" id="viewer-title"></h3>
+        <p class="viewer__note" id="viewer-note"></p>
+      </div>
+      <div class="viewer__tools">
+        <a class="viewer__open" id="viewer-open" href="#" target="_blank" rel="noopener">Открыть отдельно</a>
+        <button class="viewer__close" type="button" data-viewer-close aria-label="Закрыть просмотр"></button>
+      </div>
+    </div>
+    <div class="viewer__body" id="viewer-body"></div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   Gulnara Creates — интерактив
+   Без зависимостей:
+   1) появление блоков при скролле
+   2) полоса прогресса чтения
+   3) подсветка раздела + тень шапки
+   4) мобильное меню
+   5) экономим ресурсы: фон замирает вне фокуса
+   6) где брать файлы: рядом со страницей или с GitHub
+   7) видеоплееры
+   8) просмотр презентаций и картинок поверх страницы
+   9) ссылка на Telegram
+   ============================================================ */
+
+(function () {
+  'use strict';
+
+  // ---------- Настройки ----------
+
+  var TELEGRAM_USER = 'gulya_recruiter';   // без @, как в t.me/gulya_recruiter
+
+  // Страховка: если случайно очистить username, кнопка не станет
+  // битой, а покажет подсказку
+  var TELEGRAM_READY = TELEGRAM_USER.length > 2;
+
+  /* Откуда брать файлы роликов, презентаций и картинок.
+
+     Пока строка пустая, сайт ищет файлы рядом с собой — обычными
+     относительными ссылками. Этого достаточно в трёх случаях:
+     открыть index.html двойным кликом, залить на свой хостинг или
+     опубликовать через GitHub Pages. Ничего менять не нужно.
+
+     Заполнять только если файлы лежат ОТДЕЛЬНО от страницы — например
+     видео в GitHub, а сам сайт где-то ещё. Тогда впишите адрес папки
+     с файлами, обязательно с названием ветки и слешем в конце:
+
+     var MEDIA_FALLBACK =
+       'https://raw.githubusercontent.com/Пользователь/Репозиторий/main/';
+
+     Сайт сначала попробует скачать файл оттуда, а если не выйдет —
+     вернётся к файлу рядом с собой. Поэтому в самом худшем случае
+     сайт будет работать как раньше, а не сломается. */
+  var MEDIA_FALLBACK = '';
+
+  var header      = document.getElementById('header');
+  var nav         = document.getElementById('nav');
+  var burger      = document.getElementById('burger');
+  var backdrop    = document.querySelector('.backdrop');
+  var progressBar = document.getElementById('progress-bar');
+
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---------- 1. ПОЯВЛЕНИЕ ПРИ СКРОЛЛЕ ---------- */
+
+  var revealTargets = document.querySelectorAll('[data-rise]');
+
+  function showAll() {
+    revealTargets.forEach(function (el) { el.classList.add('is-in'); });
+  }
+
+  if ('IntersectionObserver' in window && !reduceMotion) {
+    var revealObserver = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-in');
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    }, {
+      // запускаем чуть раньше, чем блок доедет до низа экрана
+      rootMargin: '0px 0px -12% 0px',
+      threshold: 0.08
+    });
+
+    revealTargets.forEach(function (el) { revealObserver.observe(el); });
+
+    // Observer не срабатывает, пока вкладка не рисуется: блоки остались бы
+    // с opacity 0 и страница выглядела бы пустой. Поэтому если вкладка
+    // скрыта — раскрываем всё сразу, а когда она вернётся на экран —
+    // дооткрываем то, что уже видно.
+    function revealInView() {
+      revealTargets.forEach(function (el) {
+        if (el.classList.contains('is-in')) return;
+        var box = el.getBoundingClientRect();
+        if (box.top < window.innerHeight && box.bottom > 0) {
+          el.classList.add('is-in');
+        }
+      });
+    }
+
+    if (document.hidden) {
+      showAll();
+    } else {
+      document.addEventListener('visibilitychange', function () {
+        if (document.hidden) return;
+        revealInView();
+        onScroll();
+      });
+    }
+  } else {
+    // без анимации — просто показываем всё сразу
+    showAll();
+  }
+
+  /* ---------- 2. ПОЛОСА ПРОГРЕССА + 3. ПОДСВЕТКА РАЗДЕЛА ---------- */
+
+  var links = Array.prototype.slice.call(
+    document.querySelectorAll('.nav__link[href^="#"]')
+  );
+
+  var sections = links
+    .map(function (link) {
+      return document.querySelector(link.getAttribute('href'));
+    })
+    .filter(Boolean);
+
+  function onScroll() {
+    var y = window.scrollY;
+    var doc = document.documentElement;
+
+    // тень шапки
+    if (header) header.classList.toggle('is-stuck', y > 8);
+
+    // полоса прогресса
+    if (progressBar) {
+      var max = doc.scrollHeight - window.innerHeight;
+      var ratio = max > 0 ? Math.min(y / max, 1) : 0;
+      progressBar.style.transform = 'scaleX(' + ratio + ')';
+    }
+
+    if (!sections.length) return;
+
+    // активный раздел
+    var mark = y + 140;
+    var current = null;
+
+    sections.forEach(function (section) {
+      if (section.getBoundingClientRect().top + y <= mark) {
+        current = section.id;
+      }
+    });
+
+    // последний раздел иногда не достаёт до отметки
+    if (window.innerHeight + y >= doc.scrollHeight - 2) {
+      current = sections[sections.length - 1].id;
+    }
+
+    links.forEach(function (link) {
+      link.classList.toggle(
+        'is-active',
+        link.getAttribute('href') === '#' + current
+      );
+    });
+  }
+
+  // Без троттлинга: работы мало, а троттлинг на requestAnimationFrame
+  // залипал в фоновых вкладках и мог навсегда остановить подсветку.
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll);
+
+  onScroll();
+
+  /* ---------- 4. МОБИЛЬНОЕ МЕНЮ ---------- */
+
+  function setMenu(open) {
+    nav.classList.toggle('is-open', open);
+    burger.setAttribute('aria-expanded', String(open));
+    burger.setAttribute('aria-label', open ? 'Закрыть меню' : 'Открыть меню');
+  }
+
+  burger.addEventListener('click', function () {
+    setMenu(!nav.classList.contains('is-open'));
+  });
+
+  nav.addEventListener('click', function (e) {
+    if (e.target.closest('a')) setMenu(false);
+  });
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && nav.classList.contains('is-open')) {
+      setMenu(false);
+      burger.focus();
+    }
+  });
+
+  /* ---------- 5. ФОН ЗАМИРАЕТ ВНЕ ФОКУСА ---------- */
+
+  if (backdrop && !reduceMotion) {
+    document.addEventListener('visibilitychange', function () {
+      backdrop.classList.toggle('is-paused', document.hidden);
+    });
+  }
+
+  /* ---------- 6. ГДЕ БРАТЬ ФАЙЛЫ: РЯДОМ ИЛИ С ГИТХАБ ---------- */
+
+  /* Суть: файлы по умолчанию ищутся рядом со страницей. Если в
+     MEDIA_FALLBACK вписан адрес, сначала пробуем скачать оттуда, а
+     при неудаче возвращаемся к локальному файлу. Сайт не ломается,
+     даже если адрес протух или вписан с опечаткой.
+
+     Ссылку вида https://raw.githubusercontent.com/... специально
+     кодировать не нужно: браузер сам разберёт кириллицу и пробелы
+     в имени файла. */
+
+  var mediaBase = MEDIA_FALLBACK.trim().replace(/\/*$/, '/');
+  var hasRemote = mediaBase.length > 0;
+
+  // Локальный путь — значит без протокола и без почты/телефона
+  function isLocalFile(url) {
+    return !!url &&
+           !/^(?:[a-z][a-z0-9+.-]*:)?\/\//i.test(url) &&
+           !/^(?:mailto|tel|data|blob|javascript):/i.test(url);
+  }
+
+  // Адрес файла для ссылок и просмотрщика
+  function fileUrl(local) {
+    return hasRemote ? mediaBase + local : local;
+  }
+
+  // Перебирает адреса по очереди, пока файл не откроется
+  function retryWith(el, local, apply) {
+    var tries = hasRemote ? [mediaBase + local, local] : [local];
+    var step = 0;
+
+    function next() {
+      if (step >= tries.length) return;
+      apply(tries[step++], next);
+    }
+    next();
+  }
+
+  if (hasRemote) {
+    // Ролики. У <source> есть своё событие error, а после смены адреса
+    // видео надо попросить начать заново — иначе останется пустым.
+    document.querySelectorAll('video source[src]').forEach(function (source) {
+      var video = source.parentElement;
+      if (!isLocalFile(source.getAttribute('src'))) return;
+
+      retryWith(source, source.getAttribute('src'), function (url, next) {
+        source.addEventListener('error', next, { once: true });
+        source.setAttribute('src', url);
+        video.load();
+      });
+    });
+
+    // Картинки в карточках работ
+    document.querySelectorAll('img[src]').forEach(function (img) {
+      if (!isLocalFile(img.getAttribute('src'))) return;
+
+      retryWith(img, img.getAttribute('src'), function (url, next) {
+        img.addEventListener('error', next, { once: true });
+        img.setAttribute('src', url);
+      });
+    });
+  }
+
+  /* ---------- 7. ВИДЕОПЛЕЕРЫ (их несколько) ---------- */
+
+  document.querySelectorAll('[data-video]').forEach(function (video) {
+    var frame = video.closest('.vframe');
+    if (!frame) return;
+    var poster = frame.querySelector('[data-play]');
+    if (!poster) return;
+
+    poster.addEventListener('click', function () {
+      // preload="metadata" грузит только начало — playback плавный
+      var started = video.play();
+      if (started && typeof started.catch === 'function') {
+        started.catch(function () { /* автозапуск может быть отклонён */ });
+      }
+      poster.hidden = true;
+    });
+
+    video.addEventListener('play', function () { poster.hidden = true; });
+
+    // Пробел или k — play/pause, как на YouTube
+    video.addEventListener('keydown', function (e) {
+      if (e.key === ' ' || e.key === 'k') {
+        e.preventDefault();
+        video.paused ? video.play() : video.pause();
+      }
+    });
+  });
+
+  /* ---------- 8. ПРОСМОТР ФАЙЛА ПОВЕРХ СТРАНИЦЫ ---------- */
+
+  /* Презентации и картинки открываются прямо на странице. Так файл
+     не зависит от новой вкладки: в панели предпросмотра, в мобильном
+     браузере и там, где PDF по умолчанию скачивается, всё работает
+     одинаково. Ссылка в карточке остаётся настоящей, поэтому без
+     скрипта всё по-прежнему открывается. */
+  (function () {
+    var viewer = document.getElementById('viewer');
+    if (!viewer) return;
+
+    var panel   = viewer.querySelector('.viewer__panel');
+    var body    = document.getElementById('viewer-body');
+    var title   = document.getElementById('viewer-title');
+    var note    = document.getElementById('viewer-note');
+    var openBtn = document.getElementById('viewer-open');
+    var closeBtn = viewer.querySelector('.viewer__close');
+    var opener  = null;
+
+    /* У iframe с PDF нет события ошибки: страницу-заглушку GitHub
+       браузер считает успешно загруженной. Поэтому адрес заранее
+       проверяем запросом — один раз на файл, ответ запоминаем. */
+    var docCheck = {};
+
+    function resolveDoc(local) {
+      if (!hasRemote || !isLocalFile(local)) return Promise.resolve(local);
+      if (docCheck[local]) return docCheck[local];
+
+      docCheck[local] = new Promise(function (resolve) {
+        // с файла запросы заблокированы — оставляем как есть
+        if (location.protocol === 'file:') { resolve(local); return; }
+
+        var remote = mediaBase + local;
+        var settled = false;
+        var timer = setTimeout(function () {
+          if (settled) return;
+          settled = true;
+          resolve(local);
+        }, 8000);
+
+        function done(ok) {
+          if (settled) return;
+          settled = true;
+          clearTimeout(timer);
+          resolve(ok ? remote : local);
+        }
+
+        fetch(remote, { method: 'HEAD' })
+          .then(function (res) { done(res.ok); })
+          .catch(function () { done(false); });
+      });
+
+      return docCheck[local];
+    }
+
+    function show(trigger, local, name, noteText) {
+      title.textContent = name;
+      note.textContent = noteText;
+      openBtn.setAttribute('href', fileUrl(local));
+      openBtn.setAttribute('download', name);   // если браузер всё же качает
+
+      body.innerHTML = '';
+      opener = trigger;
+      viewer.hidden = false;
+      document.body.classList.add('is-locked');
+      closeBtn.focus();
+    }
+
+    function open(trigger) {
+      var local = trigger.getAttribute('href');
+      if (!local) return;
+
+      var kind = trigger.getAttribute('data-viewer');
+      var name = trigger.getAttribute('data-title') || '';
+      var size = trigger.getAttribute('data-note') || '';
+
+      show(trigger, local, name, size);
+
+      if (kind === 'image') {
+        var img = document.createElement('img');
+        img.className = 'viewer__img';
+        img.alt = name;
+        if (hasRemote) {
+          retryWith(img, local, function (url, next) {
+            img.addEventListener('error', next, { once: true });
+            img.setAttribute('src', url);
+          });
+        } else {
+          img.setAttribute('src', local);
+        }
+        body.appendChild(img);
+        return;
+      }
+
+      resolveDoc(local).then(function (url) {
+        if (viewer.hidden) return;   // пока ждали, пользователь закрыл
+        var frame = document.createElement('iframe');
+        frame.className = 'viewer__frame';
+        frame.setAttribute('title', name);
+        // #view=FitH — встроенный просмотрщик подгоняет страницу по высоте
+        frame.src = url + '#view=FitH';
+        body.appendChild(frame);
+      });
+    }
+
+    function close() {
+      if (viewer.hidden) return;
+      viewer.hidden = true;
+      body.innerHTML = '';       // освобождаем файл и память
+      document.body.classList.remove('is-locked');
+      if (opener) opener.focus();
+      opener = null;
+    }
+
+    // Перехватываем клик только по карточкам с пометкой data-viewer
+    document.addEventListener('click', function (e) {
+      var trigger = e.target.closest('[data-viewer]');
+      if (trigger) {
+        e.preventDefault();
+        open(trigger);
+        return;
+      }
+      if (e.target.closest('[data-viewer-close]')) {
+        e.preventDefault();
+        close();
+      }
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') close();
+    });
+
+    // Фокус не должен уезжать за пределы окна просмотра
+    panel.addEventListener('keydown', function (e) {
+      if (e.key !== 'Tab') return;
+      var focusable = panel.querySelectorAll('a[href], button:not([disabled])');
+      if (!focusable.length) return;
+      var first = focusable[0];
+      var last  = focusable[focusable.length - 1];
+
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    });
+  })();
+
+  /* ---------- 9. ССЫЛКА НА TELEGRAM ---------- */
+  var tgLink = document.getElementById('tg-link');
+  var tgHint = document.getElementById('tg-hint');
+
+  if (tgLink) {
+    if (TELEGRAM_READY) {
+      tgLink.setAttribute('href', 'https://t.me/' + TELEGRAM_USER);
+    } else {
+      tgLink.classList.add('is-pending');
+      tgLink.removeAttribute('href');
+      tgLink.setAttribute('aria-disabled', 'true');
+
+      tgLink.addEventListener('click', function (e) {
+        e.preventDefault();
+        if (tgHint) {
+          tgHint.textContent =
+            'Сначала замените TELEGRAM_USER в script.js.';
+        }
+      });
+    }
+  }
+
+  /* ---------- 10. НЕЗАГРУЖЕННЫЕ ФАЙЛЫ ----------
+
+     Презентации и ролики лежат отдельно от страницы, и пока их не
+     выложили на хостинг, ссылки ведут в никуда. Раньше браузер
+     показывал пустой просмотрщик — выглядело как поломка.
+
+     Теперь сайт сам сообщает, каких файлов не хватает, и выглядит
+     цельно при любом наборе выложенных файлов. */
+
+  (function checkFiles() {
+    /* Презентации и картинки: спрашиваем сервер заранее.
+       На file:// запросы заблокированы — и проверять нечего. */
+    if (location.protocol !== 'file:') {
+      var links = document.querySelectorAll('a[data-viewer][href]');
+
+      for (var i = 0; i < links.length; i++) {
+        (function (link) {
+          var url = link.getAttribute('href');
+
+          fetch(url, { method: 'HEAD' })
+            .then(function (res) {
+              if (res.ok) return;
+
+              var box = link.closest('.work') || link.parentElement;
+              if (!box || box.classList.contains('is-missing')) return;
+
+              box.classList.add('is-missing');
+              link.setAttribute('aria-disabled', 'true');
+
+              var hint = document.createElement('span');
+              hint.className = 'work__missing';
+              hint.textContent = 'Файл не загружен';
+              box.appendChild(hint);
+            })
+            .catch(function () { /* сеть недоступна — это не поломка */ });
+        })(links[i]);
+      }
+    }
+
+    /* Ролики: проверять отдельные ссылки нельзя — у одного ролика их
+       несколько, и браузер сам идёт по ним сверху вниз. Помечаем
+       рамку только когда не сработал НИ ОДИН вариант.
+
+       Проверять сразу при запуске нельзя: на этот момент браузер ещё
+       не выбрал источник и временно считает, что файлов нет. Поэтому
+       смотрим на событие ошибки и на состояние чуть позже. */
+    document.querySelectorAll('video[data-video]').forEach(function (video) {
+      var frame = video.closest('.vframe');
+      if (!frame) return;
+
+      var broken = function () {
+        // 3 = NETWORК_NO_SOURCE: ни один из вариантов не подошёл
+        return video.readyState === 0 &&
+               (!!video.error || video.networkState === 3);
+      };
+
+      var markBroken = function () {
+        if (broken()) frame.classList.add('is-missing');
+      };
+
+      video.addEventListener('error', markBroken, { once: true });
+      setTimeout(markBroken, 6000);
+    });
+  })();
+
+})();
+</script>
+</body>
+</html>
